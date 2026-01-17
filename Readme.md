@@ -1,29 +1,29 @@
-# 🚀 Swagger Express Automate - Flexible Edition
+# 🚀 Swagger Express Automate
 
-Express.js üçün **ən flexible** Swagger API sənədləşdirmə paketi. 4 fərqli üsulla istifadə edə bilərsiniz!
+The most **flexible** Swagger API documentation package for Express.js. Use it in 4 different ways!
 
-## ⚡ Quraşdırma
+## ⚡ Installation
 
 ```bash
 npm install swagger-express-automate
 ```
 
-## 🎯 Əsas Xüsusiyyətlər
+## 🎯 Key Features
 
-✅ **4 fərqli istifadə üsulu** - sizə uyğun olanı seçin  
-✅ **Router auto-scan** - `app.use()` ilə avtomatik sənədləşdirmə  
-✅ **Decorator pattern** - metadata ayrıca əlavə edin  
-✅ **Manual API** - tam nəzarət istəyənlər üçün  
-✅ **Group support** - route qrupları yaradın  
-✅ **Middleware dəstəyi** - istənilən middleware əlavə edin  
+✅ **4 different usage methods** - choose what fits you best  
+✅ **Router auto-scan** - automatic documentation with `app.use()`  
+✅ **Decorator pattern** - add metadata separately  
+✅ **Manual API** - full control for those who need it  
+✅ **Group support** - create route groups  
+✅ **Middleware friendly** - works with any middleware  
 
 ---
 
-## 📖 İstifadə Üsulları
+## 📖 Usage Methods
 
-### 🔹 Üsul 1: Router Scan (Ən Sadə)
+### 🔹 Method 1: Router Scan (Simplest)
 
-Router-lərinizi yaradın və sadəcə scan edin:
+Create your routers and just scan them:
 
 ```javascript
 const express = require('express');
@@ -31,45 +31,41 @@ const SwaggerAutomate = require('swagger-express-automate');
 
 const app = express();
 const swagger = new SwaggerAutomate(app, {
-  title: 'Mənim API-m',
+  title: 'My API',
   version: '1.0.0'
 });
 
-// Router yaradın
 const userRouter = express.Router();
-userRouter.get('/', (req, res) => res.json([{ id: 1, name: 'Ali' }]));
+userRouter.get('/', (req, res) => res.json([{ id: 1, name: 'John' }]));
 userRouter.post('/', (req, res) => res.json(req.body));
 userRouter.get('/:id', (req, res) => res.json({ id: req.params.id }));
 
-// Scan edin və istifadə edin
 app.use('/api/users', swagger.middleware(userRouter), userRouter);
 
 swagger.setupSwaggerUI('/docs');
 ```
 
-**✨ Avtomatik:**
-- Bütün route-lar scan olunur
-- Path parametrləri avtomatik tapılır
-- Default sənədləşdirmə yaranır
+**✨ Automatic:**
+- All routes are scanned
+- Path parameters auto-detected
+- Default documentation generated
 
 ---
 
-### 🔹 Üsul 2: Scan + Metadata
+### 🔹 Method 2: Scan + Metadata
 
-Router scan edin, sonra metadata əlavə edin:
+Scan routes first, then add metadata:
 
 ```javascript
-// Router scan
 app.use('/api/users', swagger.middleware(userRouter), userRouter);
 
-// Metadata əlavə et
 swagger
   .doc('GET', '/api/users', {
-    summary: 'Bütün istifadəçiləri əldə et',
+    summary: 'Get all users',
     tags: ['Users'],
     responses: {
       200: {
-        description: 'İstifadəçi siyahısı',
+        description: 'User list',
         content: {
           'application/json': {
             schema: {
@@ -86,34 +82,34 @@ swagger
     }
   })
   .doc('POST', '/api/users', {
-    summary: 'Yeni istifadəçi yarat',
+    summary: 'Create new user',
     tags: ['Users'],
     security: [{ BearerAuth: [] }],
     requestBody: swagger.createRequestBody(
       swagger.createSchema({
-        name: { type: 'string', example: 'Ali Məmmədov' },
-        email: { type: 'string', example: 'ali@example.com' }
+        name: { type: 'string', example: 'John Doe' },
+        email: { type: 'string', example: 'john@example.com' }
       }, ['name', 'email'])
     )
   });
 ```
 
-**✨ Üstünlükləri:**
-- Route-lar və sənədləşdirmə ayrıdır
-- Mövcud kodu dəyişmədən metadata əlavə edə bilərsiniz
-- Daha təmiz və modular
+**✨ Benefits:**
+- Routes and documentation are separated
+- Add metadata without changing existing code
+- Cleaner and more modular
 
 ---
 
-### 🔹 Üsul 3: Manual API (Köhnə Stil)
+### 🔹 Method 3: Manual API
 
-Route və sənədləşdirmə eyni yerdə:
+Routes and documentation together:
 
 ```javascript
 swagger.post('/api/products', (req, res) => {
   res.status(201).json(req.body);
 }, {
-  summary: 'Yeni məhsul yarat',
+  summary: 'Create new product',
   tags: ['Products'],
   security: [{ BearerAuth: [] }],
   requestBody: swagger.createRequestBody(
@@ -124,8 +120,8 @@ swagger.post('/api/products', (req, res) => {
     }, ['name', 'price'])
   ),
   responses: {
-    ...swagger.createResponse(201, 'Məhsul yaradıldı'),
-    ...swagger.createResponse(400, 'Yanlış məlumat')
+    ...swagger.createResponse(201, 'Product created'),
+    ...swagger.createResponse(400, 'Invalid data')
   }
 });
 
@@ -134,23 +130,23 @@ swagger.put('/api/products/:id', handler, config);
 swagger.delete('/api/products/:id', handler, config);
 ```
 
-**✨ İdeal hallar:**
-- Kiçik API-lər
-- Sürətli prototipler
-- Sənədləşdirmə və kod eyni yerdə olmalı
+**✨ Ideal for:**
+- Small APIs
+- Quick prototypes
+- When documentation and code should be together
 
 ---
 
-### 🔹 Üsul 4: Group Pattern
+### 🔹 Method 4: Group Pattern
 
-Route qrupları yaradın:
+Create route groups:
 
 ```javascript
 swagger.group('/api/auth', (api) => {
   api.post('/login', (req, res) => {
     res.json({ token: 'jwt_token_here' });
   }, {
-    summary: 'İstifadəçi girişi',
+    summary: 'User login',
     tags: ['Auth'],
     requestBody: api.createRequestBody(
       api.createSchema({
@@ -166,54 +162,54 @@ swagger.group('/api/auth', (api) => {
 });
 ```
 
-**✨ Üstünlükləri:**
-- Təşkilatlanmış kod
-- Prefix təkrarlanmır
-- Eyni group üçün ortaq konfiqurasiya
+**✨ Benefits:**
+- Organized code
+- No prefix repetition
+- Common configuration for the same group
 
 ---
 
-## 🛠️ Helper Metodlar
+## 🛠️ Helper Methods
 
-### Schema yaradın
+### Create Schema
 
 ```javascript
 const userSchema = swagger.createSchema({
   id: { type: 'integer', example: 1 },
-  name: { type: 'string', example: 'Ali' },
-  email: { type: 'string', format: 'email', example: 'ali@example.com' },
+  name: { type: 'string', example: 'John' },
+  email: { type: 'string', format: 'email', example: 'john@example.com' },
   age: { type: 'integer', minimum: 0, example: 25 }
 }, ['name', 'email']); // required fields
 ```
 
-### Parameter yaradın
+### Create Parameter
 
 ```javascript
 swagger.createParameter(
-  'id',              // name
-  'path',            // location: 'path', 'query', 'header', 'cookie'
-  'integer',         // type
-  true,              // required
-  'İstifadəçi ID-si' // description
+  'id',           // name
+  'path',         // location: 'path', 'query', 'header', 'cookie'
+  'integer',      // type
+  true,           // required
+  'User ID'       // description
 )
 ```
 
-### Request Body
+### Create Request Body
 
 ```javascript
 swagger.createRequestBody(
   schema,
-  'Request body təsviri',
+  'Request body description',
   true // required
 )
 ```
 
-### Response
+### Create Response
 
 ```javascript
 swagger.createResponse(
   200,
-  'Uğurlu əməliyyat',
+  'Successful operation',
   responseSchema
 )
 ```
@@ -222,25 +218,22 @@ swagger.createResponse(
 
 ## 🔐 Authentication
 
-JWT və digər autentifikasiya növlərini konfiqurasiya edin:
+Configure JWT and other authentication types:
 
 ```javascript
 const swagger = new SwaggerAutomate(app, {
   title: 'Secure API',
   securityDefinitions: {
-    // Bearer JWT
     BearerAuth: {
       type: 'http',
       scheme: 'bearer',
       bearerFormat: 'JWT'
     },
-    // API Key
     ApiKeyAuth: {
       type: 'apiKey',
       in: 'header',
       name: 'X-API-Key'
     },
-    // OAuth2
     OAuth2: {
       type: 'oauth2',
       flows: {
@@ -248,8 +241,8 @@ const swagger = new SwaggerAutomate(app, {
           authorizationUrl: 'https://example.com/oauth/authorize',
           tokenUrl: 'https://example.com/oauth/token',
           scopes: {
-            'read': 'Oxu',
-            'write': 'Yaz'
+            'read': 'Read access',
+            'write': 'Write access'
           }
         }
       }
@@ -257,16 +250,15 @@ const swagger = new SwaggerAutomate(app, {
   }
 });
 
-// Route-da istifadə edin
 swagger.get('/api/protected', handler, {
-  summary: 'Qorunan endpoint',
+  summary: 'Protected endpoint',
   security: [{ BearerAuth: [] }]
 });
 ```
 
 ---
 
-## 🏷️ Tags və Qruplar
+## 🏷️ Tags and Groups
 
 ```javascript
 const swagger = new SwaggerAutomate(app, {
@@ -274,19 +266,19 @@ const swagger = new SwaggerAutomate(app, {
   tags: [
     {
       name: 'Users',
-      description: 'İstifadəçi əməliyyatları'
+      description: 'User operations'
     },
     {
       name: 'Products',
-      description: 'Məhsul əməliyyatları',
+      description: 'Product operations',
       externalDocs: {
-        description: 'Ətraflı məlumat',
+        description: 'Learn more',
         url: 'https://docs.example.com/products'
       }
     },
     {
       name: 'Orders',
-      description: 'Sifariş əməliyyatları'
+      description: 'Order operations'
     }
   ]
 });
@@ -317,7 +309,7 @@ const swagger = new SwaggerAutomate(app, {
 
 ---
 
-## 📦 Tam Nümunə
+## 📦 Complete Example
 
 ```javascript
 const express = require('express');
@@ -326,16 +318,15 @@ const SwaggerAutomate = require('swagger-express-automate');
 const app = express();
 app.use(express.json());
 
-// Swagger konfiqurasiyası
 const swagger = new SwaggerAutomate(app, {
   title: 'E-Commerce API',
   version: '2.0.0',
-  description: 'Tam funksional e-ticarət API',
+  description: 'Fully functional e-commerce API',
   host: 'localhost:3000',
   basePath: '/api',
   tags: [
-    { name: 'Products', description: 'Məhsul əməliyyatları' },
-    { name: 'Users', description: 'İstifadəçi əməliyyatları' }
+    { name: 'Products', description: 'Product operations' },
+    { name: 'Users', description: 'User operations' }
   ],
   securityDefinitions: {
     BearerAuth: {
@@ -346,7 +337,6 @@ const swagger = new SwaggerAutomate(app, {
   }
 });
 
-// Router yaradın
 const productRouter = express.Router();
 
 productRouter.get('/', (req, res) => {
@@ -364,10 +354,8 @@ productRouter.get('/:id', (req, res) => {
   res.json({ id: req.params.id, name: 'Laptop', price: 1500 });
 });
 
-// Router-i scan və istifadə edin
 app.use('/api/products', swagger.middleware(productRouter), productRouter);
 
-// Metadata əlavə edin
 const productSchema = swagger.createSchema({
   id: { type: 'integer', example: 1 },
   name: { type: 'string', example: 'Gaming Laptop' },
@@ -377,26 +365,25 @@ const productSchema = swagger.createSchema({
 
 swagger
   .doc('GET', '/api/products', {
-    summary: 'Bütün məhsulları əldə et',
+    summary: 'Get all products',
     tags: ['Products'],
     parameters: [
-      swagger.createParameter('category', 'query', 'string', false, 'Kateqoriya filtri'),
-      swagger.createParameter('minPrice', 'query', 'number', false, 'Minimum qiymət')
+      swagger.createParameter('category', 'query', 'string', false, 'Category filter'),
+      swagger.createParameter('minPrice', 'query', 'number', false, 'Minimum price')
     ]
   })
   .doc('POST', '/api/products', {
-    summary: 'Yeni məhsul yarat',
+    summary: 'Create new product',
     tags: ['Products'],
     security: [{ BearerAuth: [] }],
     requestBody: swagger.createRequestBody(productSchema),
     responses: {
-      ...swagger.createResponse(201, 'Məhsul yaradıldı', productSchema),
-      ...swagger.createResponse(400, 'Yanlış məlumat'),
-      ...swagger.createResponse(401, 'Autentifikasiya tələb olunur')
+      ...swagger.createResponse(201, 'Product created', productSchema),
+      ...swagger.createResponse(400, 'Invalid data'),
+      ...swagger.createResponse(401, 'Authentication required')
     }
   });
 
-// Swagger UI
 swagger.setupSwaggerUI('/docs');
 
 app.listen(3000, () => {
@@ -407,32 +394,14 @@ app.listen(3000, () => {
 
 ---
 
-## 🎨 İstifadə Qərarı
+## 🎨 Decision Guide
 
-| Üsul | İdeal Hallar | Üstünlüklər |
-|------|-------------|------------|
-| **Router Scan** | Böyük layihələr, mövcud kod bazası | Sürətli, minimal dəyişiklik |
-| **Scan + Metadata** | Orta/böyük layihələr | Flexible, təmiz kod |
-| **Manual API** | Kiçik layihələr, prototipler | Sadə, hamısı bir yerdə |
-| **Group Pattern** | API versiyalaşdırma, modulyar kod | Təşkilatlanmış, oxunaqlı |
-
----
-
-## 🚀 NPM-ə Yükləmək
-
-```bash
-# 1. npm hesabı yaradın
-# https://www.npmjs.com/signup
-
-# 2. Login olun
-npm login
-
-# 3. Publish edin
-npm publish
-
-# Scoped package üçün
-npm publish --access public
-```
+| Method | Ideal For | Advantages |
+|------|----------|-----------|
+| **Router Scan** | Large projects, existing codebase | Fast, minimal changes |
+| **Scan + Metadata** | Medium/large projects | Flexible, clean code |
+| **Manual API** | Small projects, prototypes | Simple, everything together |
+| **Group Pattern** | API versioning, modular code | Organized, readable |
 
 ---
 
@@ -440,242 +409,10 @@ npm publish --access public
 
 MIT
 
-## 🤝 Töhfə
+## 🤝 Contributing
 
-Pull request-lər qəbul edilir! Böyük dəyişikliklər üçün əvvəlcə issue açın.
-
----
-
-# 🔄 İstifadə Üsulları Müqayisəsi
-
-## 4 Fərqli Üsul
-
-### 📊 Müqayisə Cədvəli
-
-| Xüsusiyyət | Router Scan | Scan + Metadata | Manual API | Group Pattern |
-|-----------|------------|----------------|-----------|---------------|
-| **Sürət** | ⚡⚡⚡ | ⚡⚡ | ⚡ | ⚡⚡ |
-| **Flexibility** | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
-| **Kod təmizliyi** | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
-| **Öyrənmə asanlığı** | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
-| **Böyük layihə** | ✅ | ✅ | ❌ | ✅ |
-| **Kiçik layihə** | ✅ | ⚠️ | ✅ | ⚠️ |
-| **Mövcud koda uyğun** | ✅ | ✅ | ❌ | ⚠️ |
+Pull requests are welcome! For major changes, please open an issue first.
 
 ---
 
-## 1️⃣ Router Scan
-
-### ✅ İstifadə edin:
-- Mövcud kod bazası var
-- Sürətli inteqrasiya lazımdır
-- Minimal dəyişiklik istəyirsiniz
-- Böyük layihədə işləyirsiniz
-
-### ❌ İstifadə etməyin:
-- Çox detallı sənədləşdirmə lazımdır
-- Hər endpoint üçün xüsusi konfiqurasiya
-
-### 📝 Kod Nümunəsi:
-
-```javascript
-const userRouter = express.Router();
-userRouter.get('/', handler);
-userRouter.post('/', handler);
-
-// Sadəcə scan edin
-app.use('/users', swagger.middleware(userRouter), userRouter);
-```
-
-**⏱️ İnteqrasiya müddəti: 5 dəqiqə**
-
----
-
-## 2️⃣ Scan + Metadata
-
-### ✅ İstifadə edin:
-- Mövcud router-lər var
-- Detallı sənədləşdirmə lazımdır
-- Kod və sənədləşdirmə ayrı olmalıdır
-- Team ilə işləyirsiniz
-
-### ❌ İstifadə etməyin:
-- Kiçik prototip yaradırsınız
-- Minimum konfiqurasiya lazımdır
-
-### 📝 Kod Nümunəsi:
-
-```javascript
-// 1. Router scan
-app.use('/users', swagger.middleware(userRouter), userRouter);
-
-// 2. Metadata ayrıca
-swagger
-  .doc('GET', '/users', {
-    summary: 'İstifadəçilər',
-    tags: ['Users'],
-    responses: { ... }
-  })
-  .doc('POST', '/users', {
-    summary: 'Yarat',
-    requestBody: { ... }
-  });
-```
-
-**⏱️ İnteqrasiya müddəti: 15-30 dəqiqə**
-
----
-
-## 3️⃣ Manual API
-
-### ✅ İstifadə edin:
-- Yeni layihə başlayırsınız
-- Kiçik API yaradırsınız
-- Sürətli prototip lazımdır
-- Route və doc eyni yerdə olmalıdır
-
-### ❌ İstifadə etməyin:
-- Böyük layihə
-- Çoxlu route var
-- Team ilə işləyirsiniz
-
-### 📝 Kod Nümunəsi:
-
-```javascript
-swagger.get('/users', handler, {
-  summary: 'İstifadəçilər',
-  tags: ['Users']
-});
-
-swagger.post('/users', handler, {
-  summary: 'Yarat',
-  requestBody: swagger.createRequestBody(...)
-});
-```
-
-**⏱️ İnteqrasiya müddəti: 10 dəqiqə**
-
----
-
-## 4️⃣ Group Pattern
-
-### ✅ İstifadə edin:
-- API versiyalaşdırma
-- Prefix təkrarlanır
-- Modulyar struktur istəyirsiniz
-- Auth/Admin kimi qruplar var
-
-### ❌ İstifadə etməyin:
-- Sadə flat struktur var
-- Qruplama lazım deyil
-
-### 📝 Kod Nümunəsi:
-
-```javascript
-swagger.group('/api/v2/auth', (api) => {
-  api.post('/login', handler, config);
-  api.post('/register', handler, config);
-  api.post('/logout', handler, config);
-});
-```
-
-**⏱️ İnteqrasiya müddəti: 10-20 dəqiqə**
-
----
-
-## 🎯 Tövsiyələr
-
-### Yeni Layihə
-```
-1. Manual API (kiçik) və ya
-2. Group Pattern (orta/böyük)
-```
-
-### Mövcud Layihə
-```
-1. Router Scan (sürətli) və ya
-2. Scan + Metadata (detallı)
-```
-
-### Enterprise Layihə
-```
-Scan + Metadata
-+ Advanced patterns
-+ Middleware stack
-```
-
-### Prototip
-```
-Manual API
-Sürətli və sadə
-```
-
----
-
-## 💡 Best Practices
-
-### ✅ Hamısı üçün:
-- Helper metodlardan istifadə edin
-- Schema-ları reusable edin
-- Tags-ları düzgün qruplaşdırın
-- Security doğru konfiqurasiya edin
-- Responses tam olsun
-
-### ✅ Router Scan:
-- Metadata sonradan əlavə edin
-- Route naming convention istifadə edin
-
-### ✅ Scan + Metadata:
-- Metadata-nı ayrı faylda saxlayın
-- TypeScript istifadə edin (optional)
-
-### ✅ Manual API:
-- Group pattern-lə kombinasiya edin
-- Həddən artıq uzun etməyin
-
-### ✅ Group Pattern:
-- Prefix-ləri constant-da saxlayın
-- Versiyalaşdırma üçün ideal
-
----
-
-## 🔄 Miqrasiya
-
-### Router Scan → Scan + Metadata
-```javascript
-// Öncə
-app.use('/users', swagger.middleware(userRouter), userRouter);
-
-// Sonra metadata əlavə edin
-swagger.doc('GET', '/users', config);
-```
-
-### Manual API → Router Scan
-```javascript
-// Öncə
-swagger.get('/users', handler, config);
-
-// Sonra router yarat
-const router = express.Router();
-router.get('/', handler);
-app.use('/users', swagger.middleware(router), router);
-swagger.doc('GET', '/users', config);
-```
-
----
-
-## 📊 Layihə Ölçüsünə görə
-
-| Routes Sayı | Tövsiyə | Alternativ |
-|------------|---------|-----------|
-| 1-10 | Manual API | Group Pattern |
-| 11-50 | Scan + Metadata | Group Pattern |
-| 51-100 | Router Scan | Scan + Metadata |
-| 100+ | Router Scan | Modulyar struktur |
-
----
-
-Sualınız varsa, issue açın! 🚀
-
-
-**Yaradıldı ❤️ ilə Express.js və Swagger istifadəçiləri üçün**
+**Built with ❤️ for Express.js and Swagger users**
