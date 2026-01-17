@@ -1,1 +1,48 @@
-!dist
+# Documentation files
+COMPARISON.md
+NPM_COMPARISON.md
+NPM_PUBLISH_GUIDE.md
+QUICK_PUBLISH.md
+GITHUB_NPM_GUIDE.md
+STRUCTURE.md
+TEST_BACKEND.md
+
+# Example files
+example-*.js
+examples/
+
+# Build and scripts
+publish.sh
+*.sh
+
+# Development
+.vscode/
+.idea/
+.git/
+.github/
+.gitignore
+
+# Test files
+test/
+*.test.js
+*.spec.js
+coverage/
+
+# Docs folder
+docs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Misc
+.editorconfig
+.eslintrc*
+.prettierrc*
+tsconfig.json
