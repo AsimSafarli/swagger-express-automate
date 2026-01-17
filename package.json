@@ -1,6 +1,6 @@
 {
   "name": "swagger-express-automate",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Express.js üçün flexible Swagger API sənədləşdirmə generatoru - 4 fərqli istifadə üsulu",
   "main": "index.js",
   "keywords": [
