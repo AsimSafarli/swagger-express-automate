@@ -21,14 +21,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AsimSafarli/swagger-express-automate.git"
+    "url": "git+https://github.com/AsimSafarli/swagger-express-automate.git"
   },
   "bugs": {
     "url": "https://github.com/AsimSafarli/swagger-express-automate/issues"
   },
   "homepage": "https://github.com/AsimSafarli/swagger-express-automate#readme",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org"
   },
   "dependencies": {
     "swagger-ui-express": "^5.0.0"
