@@ -1,0 +1,50 @@
+{
+  "name": "swagger-express-automate",
+  "version": "1.0.0",
+  "description": "Express.js üçün flexible Swagger API sənədləşdirmə generatoru - 4 fərqli istifadə üsulu",
+  "main": "index.js",
+  "keywords": [
+    "express",
+    "swagger",
+    "api",
+    "documentation",
+    "openapi",
+    "rest",
+    "api-documentation",
+    "swagger-ui",
+    "router",
+    "middleware",
+    "flexible",
+    "auto-generate"
+  ],
+  "author": "Asim Safarli <asimsafar.dev@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AsimSafarli/swagger-express-automate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AsimSafarli/swagger-express-automate/issues"
+  },
+  "homepage": "https://github.com/AsimSafarli/swagger-express-automate#readme",
+  "dependencies": {
+    "swagger-ui-express": "^5.0.0"
+  },
+  "peerDependencies": {
+    "express": "^4.0.0 || ^5.0.0"
+  },
+  "devDependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "scripts": {
+    "example:simple": "node example/example-simple.js",
+    "example:flexible": "node example/example-flexible.js",
+    "example:advanced": "node example/example-advanced.js",
+    "prepare": "npm run test",
+    "prepublishOnly": "npm test",
+    "test": "echo \"No tests yet\""
+  }
+}
