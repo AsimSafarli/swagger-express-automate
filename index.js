@@ -1,21 +1,21 @@
-import  swaggerUi  from 'swagger-ui-express'
+import swaggerUi from "swagger-ui-express";
 
 class SwaggerExpressAutomate {
   constructor(app, options = {}) {
     this.app = app;
     this.options = {
       info: {
-        title: options.title || 'API Documentation',
-        version: options.version || '1.0.0',
-        description: options.description || 'Auto-generated API documentation',
+        title: options.title || "API Documentation",
+        version: options.version || "1.0.0",
+        description: options.description || "Auto-generated API documentation",
       },
-      host: options.host || 'localhost:3000',
-      basePath: options.basePath || '/api',
-      schemes: options.schemes || ['http'],
+      host: options.host || "localhost:3000",
+      basePath: options.basePath || "/api",
+      schemes: options.schemes || ["http"],
       servers: options.servers || [],
       tags: options.tags || [],
       securityDefinitions: options.securityDefinitions || {},
-      ...options
+      ...options,
     };
     this.routes = new Map();
     this.routeConfigs = new Map();
@@ -24,19 +24,19 @@ class SwaggerExpressAutomate {
   /**
    * Express router və route-ları scan edir
    */
-  scanRouter(router, basePath = '') {
+  scanRouter(router, basePath = "") {
     if (!router || !router.stack) return this;
 
-    router.stack.forEach(layer => {
+    router.stack.forEach((layer) => {
       if (layer.route) {
         // Birbaşa route
         const fullPath = this._normalizePath(basePath + layer.route.path);
         const methods = Object.keys(layer.route.methods);
 
-        methods.forEach(method => {
+        methods.forEach((method) => {
           this._addScannedRoute(method.toUpperCase(), fullPath, layer.route);
         });
-      } else if (layer.name === 'router' && layer.handle.stack) {
+      } else if (layer.name === "router" && layer.handle.stack) {
         // Nested router
         let routePath = this._extractRoutePath(layer.regexp);
         this.scanRouter(layer.handle, basePath + routePath);
@@ -50,24 +50,23 @@ class SwaggerExpressAutomate {
    * Middleware - app.use() ilə istifadə üçün
    */
   middleware(routerOrPath, router) {
-    // Heç bir parametr verilməyibsə - sadəcə pass-through middleware
     if (!routerOrPath) {
       return (req, res, next) => next();
     }
 
-    // app.use(swagger.middleware(router))
-    if (typeof routerOrPath === 'function' || (routerOrPath && routerOrPath.stack)) {
-      this.scanRouter(routerOrPath);
-      return (req, res, next) => next();
+    if (
+      typeof routerOrPath === "function" ||
+      (routerOrPath && routerOrPath.stack)
+    ) {
+      this.scanRouter(routerOrPath, "");
+      return routerOrPath; 
     }
 
-    // app.use('/api', swagger.middleware(router))
-    if (router) {
+    if (typeof routerOrPath === "string" && router) {
       this.scanRouter(router, routerOrPath);
-      return (req, res, next) => next();
+      return router;
     }
 
-    // Sadəcə middleware qaytarır
     return (req, res, next) => next();
   }
 
@@ -81,7 +80,7 @@ class SwaggerExpressAutomate {
     this.routeConfigs.set(routeKey, {
       method: method.toUpperCase(),
       path: normalizedPath,
-      config: config
+      config: config,
     });
 
     // Express route-nu qeyd et
@@ -99,7 +98,7 @@ class SwaggerExpressAutomate {
     this.routeConfigs.set(routeKey, {
       method: method.toUpperCase(),
       path: normalizedPath,
-      config: config
+      config: config,
     });
 
     return this;
@@ -131,23 +130,23 @@ class SwaggerExpressAutomate {
    * HTTP metodları
    */
   get(path, handler, config) {
-    return this.addRoute('GET', path, handler, config);
+    return this.addRoute("GET", path, handler, config);
   }
 
   post(path, handler, config) {
-    return this.addRoute('POST', path, handler, config);
+    return this.addRoute("POST", path, handler, config);
   }
 
   put(path, handler, config) {
-    return this.addRoute('PUT', path, handler, config);
+    return this.addRoute("PUT", path, handler, config);
   }
 
   delete(path, handler, config) {
-    return this.addRoute('DELETE', path, handler, config);
+    return this.addRoute("DELETE", path, handler, config);
   }
 
   patch(path, handler, config) {
-    return this.addRoute('PATCH', path, handler, config);
+    return this.addRoute("PATCH", path, handler, config);
   }
 
   /**
@@ -155,44 +154,50 @@ class SwaggerExpressAutomate {
    */
   createSchema(properties, required = []) {
     return {
-      type: 'object',
+      type: "object",
       properties: properties,
-      required: required
+      required: required,
     };
   }
 
-  createParameter(name, location, type = 'string', required = false, description = '') {
+  createParameter(
+    name,
+    location,
+    type = "string",
+    required = false,
+    description = "",
+  ) {
     return {
       name: name,
       in: location,
       required: required,
       description: description,
-      schema: { type: type }
+      schema: { type: type },
     };
   }
 
-  createRequestBody(schema, description = 'Request body', required = true) {
+  createRequestBody(schema, description = "Request body", required = true) {
     return {
       required: required,
       description: description,
       content: {
-        'application/json': {
-          schema: schema
-        }
-      }
+        "application/json": {
+          schema: schema,
+        },
+      },
     };
   }
 
   createResponse(code, description, schema = null) {
     const response = {
-      description: description
+      description: description,
     };
 
     if (schema) {
       response.content = {
-        'application/json': {
-          schema: schema
-        }
+        "application/json": {
+          schema: schema,
+        },
       };
     }
 
@@ -216,41 +221,47 @@ class SwaggerExpressAutomate {
 
       paths[path][method.toLowerCase()] = this._buildOperation(
         routeInfo,
-        config ? config.config : null
+        config ? config.config : null,
       );
     });
 
     const swaggerSpec = {
-      openapi: '3.0.0',
+      openapi: "3.0.0",
       info: this.options.info,
-      servers: this.options.servers.length > 0 ? this.options.servers : [
-        {
-          url: `${this.options.schemes[0]}://${this.options.host}`,
-          description: 'API Server'
-        }
-      ],
+      servers:
+        this.options.servers.length > 0
+          ? this.options.servers
+          : [
+              {
+                url: `${this.options.schemes[0]}://${this.options.host}`,
+                description: "API Server",
+              },
+            ],
       tags: this.options.tags,
       paths: paths,
       components: {
-        securitySchemes: this.options.securityDefinitions
-      }
+        securitySchemes: this.options.securityDefinitions,
+      },
     };
 
     return swaggerSpec;
   }
 
-
-  setupSwaggerUI(docsPath = '/api-docs') {
+  setupSwaggerUI(docsPath = "/api-docs") {
     const swaggerSpec = this.generateSwaggerSpec();
 
     this.app.get(`${docsPath}.json`, (req, res) => {
       res.json(swaggerSpec);
     });
 
-    this.app.use(docsPath, swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-      customSiteTitle: this.options.info.title,
-      customCss: '.swagger-ui .topbar { display: none }'
-    }));
+    this.app.use(
+      docsPath,
+      swaggerUi.serve,
+      swaggerUi.setup(swaggerSpec, {
+        customSiteTitle: this.options.info.title,
+        customCss: ".swagger-ui .topbar { display: none }",
+      }),
+    );
 
     console.log(`📚 Swagger UI: http://${this.options.host}${docsPath}`);
     console.log(`📄 Swagger JSON: http://${this.options.host}${docsPath}.json`);
@@ -262,23 +273,26 @@ class SwaggerExpressAutomate {
    * Private: Route path-ı normallaşdırır
    */
   _normalizePath(path) {
-    return path.replace(/\/+/g, '/').replace(/\/$/, '') || '/';
+    return path.replace(/\/+/g, "/").replace(/\/$/, "") || "/";
   }
 
   /**
    * Private: RegExp-dən route path çıxarır
    */
   _extractRoutePath(regexp) {
-    const source = regexp.source;
-    let path = source
-      .replace('\\/?', '')
-      .replace('(?=\\/|$)', '')
-      .replace(/\\\//g, '/')
-      .replace(/\^/g, '')
-      .replace(/\$/g, '')
-      .replace(/\?\(\?\=/g, '');
+    const str = regexp.toString();
 
-    return path || '';
+    const match = str.match(/^\/\^(\\\/[^?]*?)(?:\\\/)?\?\(\?[=:]/);
+    if (match) {
+      return match[1].replace(/\\\//g, "/");
+    }
+
+    const simpleMatch = str.match(/^\/\^(\\\/\w+)+/);
+    if (simpleMatch) {
+      return simpleMatch[0].replace("/^", "").replace(/\\\//g, "/");
+    }
+
+    return "";
   }
 
   /**
@@ -291,7 +305,7 @@ class SwaggerExpressAutomate {
       this.routes.set(routeKey, {
         method: method,
         path: path,
-        expressRoute: expressRoute
+        expressRoute: expressRoute,
       });
     }
   }
@@ -305,18 +319,18 @@ class SwaggerExpressAutomate {
     // Default operation
     const operation = {
       summary: config?.summary || `${method} ${path}`,
-      description: config?.description || '',
-      tags: config?.tags || ['default'],
+      description: config?.description || "",
+      tags: config?.tags || ["default"],
       responses: config?.responses || {
         200: {
-          description: 'Successful operation',
+          description: "Successful operation",
           content: {
-            'application/json': {
-              schema: { type: 'object' }
-            }
-          }
-        }
-      }
+            "application/json": {
+              schema: { type: "object" },
+            },
+          },
+        },
+      },
     };
 
     // Parameters əlavə et
@@ -326,11 +340,11 @@ class SwaggerExpressAutomate {
       // Path parametrlərini avtomatik çıxar
       const pathParams = this._extractPathParams(path);
       if (pathParams.length > 0) {
-        operation.parameters = pathParams.map(param => ({
+        operation.parameters = pathParams.map((param) => ({
           name: param,
-          in: 'path',
+          in: "path",
           required: true,
-          schema: { type: 'string' }
+          schema: { type: "string" },
         }));
       }
     }
@@ -360,6 +374,5 @@ class SwaggerExpressAutomate {
     return params;
   }
 }
-
 
 export default SwaggerExpressAutomate;
